@@ -1,0 +1,108 @@
+<div class="container">
+  <header>
+    <h1>Görev Yöneticisi</h1>
+  </header>
+
+  <div class="task-form-card" [style.border]="editingTaskId ? '2px solid #3498db' : 'none'">
+    
+    <h2 *ngIf="!editingTaskId">Yeni Görev Ekle</h2>
+    <h2 *ngIf="editingTaskId" style="color: #3498db;">Görevi Düzenle</h2>
+
+    <div class="form-group">
+      <input type="text" [(ngModel)]="newTaskTitle" (keyup.enter)="saveTask()" placeholder="Yapılacak bir şey yaz..." class="form-input">
+    </div>
+    
+    <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <select [(ngModel)]="newCategory" class="form-select">
+        <option value="İş">İş</option>
+        <option value="Okul">Okul</option>
+        <option value="Kişisel">Kişisel</option>
+        <option value="Diğer">Diğer</option>
+      </select>
+      <select [(ngModel)]="newPriority" class="form-select">
+        <option value="Düşük">Düşük</option>
+        <option value="Orta">Orta</option>
+        <option value="Yüksek">Yüksek</option>
+      </select>
+      <input type="date" [(ngModel)]="newDeadline" class="form-input" style="width: auto;">
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+      <button (click)="saveTask()" class="add-btn" 
+              [style.background-color]="editingTaskId ? '#3498db' : '#27ae60'">
+        {{ editingTaskId ? 'Güncelle 💾' : 'Ekle +' }}
+      </button>
+
+      <button *ngIf="editingTaskId" (click)="cancelEdit()" class="cancel-btn">
+        Vazgeç ❌
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-group">
+      <label>Kategori:</label>
+      <select [(ngModel)]="filterCategory">
+        <option value="Tümü">Tümü</option>
+        <option value="İş">İş</option>
+        <option value="Okul">Okul</option>
+        <option value="Kişisel">Kişisel</option>
+        <option value="Diğer">Diğer</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Durum:</label>
+      <select [(ngModel)]="filterStatus">
+        <option value="Tümü">Tümü</option>
+        <option value="Tamamlananlar">Tamamlananlar</option>
+        <option value="Yapılacaklar">Yapılacaklar</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Sırala:</label>
+      <select [(ngModel)]="sortOption">
+        <option value="date-asc">📅 Tarihe Göre</option>
+        <option value="priority-desc">🔥 Önceliğe Göre</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="task-list">
+    <h3>Görevlerim ({{ filteredTasks.length }})</h3>
+
+    <div *ngIf="filteredTasks.length === 0" class="empty-state">
+        Listelenecek görev yok.
+    </div>
+
+    <ul style="list-style: none; padding: 0;">
+      <li *ngFor="let task of filteredTasks" 
+          class="task-item"
+          [class.completed-task]="task.isCompleted"
+          [style.border-left]="editingTaskId === task.id ? '5px solid #3498db' : '1px solid #eee'">
+        
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" [checked]="task.isCompleted" (change)="toggleCompletion(task)" style="cursor: pointer; width: 18px;">
+          <div>
+            <div style="font-weight: 500;">{{ task.title }}</div>
+            <div style="font-size: 0.8rem; color: #7f8c8d; display: flex; gap: 10px;">
+              <span>📁 {{ task.category }}</span>
+              <span *ngIf="task.deadline">📅 {{ task.deadline }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 5px;">
+           <span class="badge" 
+                 [class.high-priority]="task.priority === 'Yüksek'"
+                 [class.low-priority]="task.priority === 'Düşük'">
+              {{ task.priority }}
+           </span>
+
+           <button (click)="startEditing(task)" class="edit-btn">✏️</button>
+
+           <button (click)="deleteTask(task)" class="delete-btn">🗑️</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
